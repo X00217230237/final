@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="description" content="BalcoBio is a small-space balcony habitat atlas for plants, pollinators and everyday wildlife.">
+  <title>BalcoBio | Balcony Habitat Atlas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" v-cloak>
+  <header class="topbar">
+    <nav class="navwrap" aria-label="Main navigation">
+      <a class="brand" href="#home" v-on:click="clsNav">BalcoBio</a>
+      <button class="hamb" type="button" aria-label="Toggle navigation" v-bind:aria-expanded="navOp.toString()" v-on:click="navOp=!navOp">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="navlist" v-bind:class="{open:navOp}">
+        <li><a href="#about" v-on:click="clsNav">Idea</a></li>
+        <li><a href="#search" v-on:click="clsNav">Atlas</a></li>
+        <li><a href="#carousel" v-on:click="clsNav">Habitats</a></li>
+        <li><a href="#forms" v-on:click="clsNav">Share</a></li>
+        <li><a href="#faq" v-on:click="clsNav">FAQ</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Small spaces. Living ecosystems.</p>
+        <h1 id="hero-title">Turn a balcony into a small living habitat.</h1>
+        <p class="lead">Discover how plants, insects, water and shelter can bring more life to even the smallest balcony.</p>
+        <div class="hero-actions">
+          <a class="btn pri" href="#search">Explore the atlas</a>
+          <a class="btn sec" href="#forms">Share an observation</a>
+        </div>
+        <div class="mini-stat" aria-label="BalcoBio summary">
+          <span><strong>{{ spots.length }}</strong> habitat ideas</span>
+          <span><strong>{{ carSl.length }}</strong> balcony patterns</span>
+          <span><strong>Made</strong> for small spaces</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <img src="assets/img_4.png" alt="Illustration of a bright balcony with flowering pots and visiting insects">
+      </div>
+    </section>
+    <section class="sec intro" id="about">
+      <div class="sec-head">
+        <p class="eyebrow">Why BalcoBio</p>
+        <h2>A tiny atlas for everyday balconies</h2>
+      </div>
+      <div class="idea-grid">
+        <article class="idea-card">
+          <span class="num">01</span>
+          <h3>Notice</h3>
+          <p>Notice visiting insects, flowering times, changing light and quiet sheltered corners.</p>
+        </article>
+        <article class="idea-card">
+          <span class="num">02</span>
+          <h3>Explore</h3>
+          <p>Explore plants and habitat features that suit different light, space and shelter conditions.</p>
+        </article>
+        <article class="idea-card">
+          <span class="num">03</span>
+          <h3>Connect</h3>
+          <p>Record what you notice and discover simple ways to make your balcony more welcoming to small wildlife.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="sec atlas" id="search">
+      <div class="sec-head split">
+        <div>
+          <p class="eyebrow">Balcony atlas</p>
+          <h2>Explore plants and habitat features</h2>
+        </div>
+        <div class="srchbox">
+          <label for="srch">Search by plant, light, shelter or wildlife benefit</label>
+          <input id="srch" type="search" placeholder="Try: bee, shade, shelter" v-model="srch">
+        </div>
+      </div>
+      <p class="srch-status" aria-live="polite" v-if="!srch.trim()">Explore all balcony habitat ideas.</p>
+      <p class="srch-status warn" aria-live="polite" v-else-if="fltCards.length===0">No habitat idea matches "{{ srch }}". Try another word.</p>
+      <p class="srch-status" aria-live="polite" v-else>Found {{ fltCards.length }} habitat idea{{ fltCards.length===1?'':'s' }}.</p>
+      <div class="atlas-grid" v-if="fltCards.length>0">
+        <article class="atlas-card" v-for="itm in fltCards" v-bind:key="itm.id">
+          <div class="tagrow">
+            <span class="tag">{{ itm.grp }}</span>
+            <span class="tag pale">{{ itm.lit }}</span>
+          </div>
+          <h3>{{ itm.nam }}</h3>
+          <p>{{ itm.txt }}</p>
+          <dl>
+            <div><dt>Best feature</dt><dd>{{ itm.ftr }}</dd></div>
+            <div><dt>Useful for</dt><dd>{{ itm.use }}</dd></div>
+          </dl>
+        </article>
+      </div>
+      <div class="empty" v-else><p>Try a plant name, light condition or habitat feature.</p></div>
+    </section>
+    <section class="sec car-sec" id="carousel">
+      <div class="sec-head">
+        <p class="eyebrow">Habitat inspiration</p>
+        <h2>Three ways to create more habitat</h2>
+        <p class="sub">See how planting layers, water and sheltered corners can create different conditions for balcony wildlife.</p>
+      </div>
+
+      <div class="carbox" v-on:mouseenter="pausCar" v-on:mouseleave="strtCar" aria-roledescription="carousel" aria-label="Balcony habitat ideas">
+        <div class="carview">
+          <article class="carslide" v-for="(sl,ix) in carSl" v-bind:key="sl.id" v-show="carIx===ix">
+            <div class="car-img"><img v-bind:src="sl.img" v-bind:alt="sl.alt"></div>
+            <div class="car-copy">
+              <p class="eyebrow">Habitat idea {{ ix+1 }} of {{ carSl.length }}</p>
+              <h3>{{ sl.ttl }}</h3>
+              <p>{{ sl.txt }}</p>
+              <ul><li v-for="pt in sl.pts" v-bind:key="pt">{{ pt }}</li></ul>
+            </div>
+          </article>
+        </div>
+        <button class="carbtn prev" type="button" aria-label="Previous habitat idea" v-on:click="prvCar">&#8249;</button>
+        <button class="carbtn next" type="button" aria-label="Next habitat idea" v-on:click="nxtCar">&#8250;</button>
+        <div class="dots" aria-label="Choose habitat idea">
+          <button v-for="(sl,ix) in carSl" v-bind:key="'dot-'+sl.id" type="button" v-bind:class="{active:carIx===ix}" v-bind:aria-label="'Go to habitat idea '+(ix+1)" v-on:click="goCar(ix)"></button>
+        </div>
+      </div>
+    </section>
+    <section class="sec forms" id="forms">
+      <div class="sec-head">
+        <p class="eyebrow">Take part</p>
+        <h2>Observe, share and plan</h2>
+        <p class="sub">Share something you noticed or explore a habitat direction for your own balcony.</p>
+      </div>
+      <div class="form-grid">
+        <form class="form-card" novalidate v-on:submit.prevent="subSig">
+          <div class="form-title">
+            <span class="num">A</span>
+            <div>
+              <h3>Share an observation</h3>
+              <p>Record a plant, insect or small moment of balcony wildlife.</p>
+            </div>
+          </div>
+          <div class="fld">
+            <label for="sig-nam">Display name</label>
+            <input id="sig-nam" type="text" maxlength="30" placeholder="2 to 30 characters" v-model.trim="sigFrm.nam" v-on:input="valSig('nam')">
+            <small class="err" v-show="sigTch.nam&&sigErr.nam">{{ sigErr.nam }}</small>
+          </div>
+
+          <div class="fld">
+            <label for="sig-eml">Email</label>
+            <input id="sig-eml" type="email" placeholder="name@example.com" v-model.trim="sigFrm.eml" v-on:input="valSig('eml')">
+            <small class="err" v-show="sigTch.eml&&sigErr.eml">{{ sigErr.eml }}</small>
+          </div>
+          <div class="fld two">
+            <div>
+              <label for="sig-vis">What did you notice?</label>
+              <input id="sig-vis" type="text" maxlength="40" placeholder="Example: hoverfly, bee or thyme" v-model.trim="sigFrm.vis" v-on:input="valSig('vis')">
+              <small class="err" v-show="sigTch.vis&&sigErr.vis">{{ sigErr.vis }}</small>
+            </div>
+            <div>
+              <label for="sig-dt">When did you see it?</label>
+              <input id="sig-dt" type="date" v-model="sigFrm.dt" v-on:input="valSig('dt')">
+              <small class="err" v-show="sigTch.dt&&sigErr.dt">{{ sigErr.dt }}</small>
+            </div>
+          </div>
+
+          <div class="fld">
+            <label for="sig-nt">Observation note</label>
+            <textarea id="sig-nt" rows="4" maxlength="160" placeholder="Where did you see it, and what caught your attention?" v-model.trim="sigFrm.nt" v-on:input="valSig('nt')"></textarea>
+            <div class="count">{{ sigFrm.nt.length }}/160</div>
+            <small class="err" v-show="sigTch.nt&&sigErr.nt">{{ sigErr.nt }}</small>
+          </div>
+          <button class="btn pri wide" type="submit">Share observation</button>
+          <p class="okmsg" v-if="sigOk">Thanks for adding another balcony observation.</p>
+        </form>
+        <form class="form-card alt" novalidate v-on:submit.prevent="subPln">
+          <div class="form-title">
+            <span class="num">B</span>
+            <div>
+              <h3>Explore your balcony habitat</h3>
+              <p>Choose your balcony conditions and discover a habitat direction that fits the space.</p>
+            </div>
+          </div>
+
+          <div class="fld">
+            <label for="pln-nam">Display name</label>
+            <input id="pln-nam" type="text" maxlength="30" placeholder="2 to 30 characters" v-model.trim="plnFrm.nam" v-on:input="valPln('nam')">
+            <small class="err" v-if="plnTch.nam&&plnErr.nam">{{ plnErr.nam }}</small>
+          </div>
+          <div class="fld">
+            <label for="pln-eml">Email</label>
+            <input id="pln-eml" type="email" placeholder="name@example.com" v-model.trim="plnFrm.eml" v-on:input="valPln('eml')">
+            <small class="err" v-if="plnTch.eml&&plnErr.eml">{{ plnErr.eml }}</small>
+          </div>
+          <div class="fld two">
+            <div>
+              <label for="pln-sz">Balcony size</label>
+              <select id="pln-sz" v-model="plnFrm.sz" v-on:change="valPln('sz')">
+                <option value="">Choose one</option>
+                <option value="tiny">Under 2 m²</option>
+                <option value="small">2 to 5 m²</option>
+                <option value="wide">Over 5 m²</option>
+              </select>
+              <small class="err" v-if="plnTch.sz&&plnErr.sz">{{ plnErr.sz }}</small>
+            </div>
+            <div>
+              <label for="pln-lit">Daily light</label>
+              <select id="pln-lit" v-model="plnFrm.lit" v-on:change="valPln('lit')">
+                <option value="">Choose one</option>
+                <option value="shade">Mostly shade</option>
+                <option value="mixed">Mixed light</option>
+                <option value="sun">Mostly sun</option>
+              </select>
+              <small class="err" v-if="plnTch.lit&&plnErr.lit">{{ plnErr.lit }}</small>
+            </div>
+          </div>
+          <div class="fld">
+            <label for="pln-foc">What would you like to encourage?</label>
+            <select id="pln-foc" v-model="plnFrm.foc" v-on:change="valPln('foc')">
+              <option value="">Choose one</option>
+              <option value="pollinator">More pollinator visits</option>
+              <option value="shelter">More shelter and cover</option>
+              <option value="season">More life across the seasons</option>
+            </select>
+            <small class="err" v-if="plnTch.foc&&plnErr.foc">{{ plnErr.foc }}</small>
+          </div>
+          <div class="plan-prev" v-show="plnFrm.lit&&plnFrm.foc">
+            <span>Your habitat direction</span>
+            <strong>{{ plnPrev }}</strong>
+          </div>
+          <button class="btn pri wide" type="submit">Explore my habitat direction</button>
+          <p class="okmsg" v-if="plnOk">Suggested direction: {{ plnDone }}.</p>
+        </form>
+      </div>
+    </section>
+
+    <section class="sec faq" id="faq">
+      <div class="sec-head">
+        <p class="eyebrow">Balcony basics</p>
+        <h2>Questions about balcony biodiversity</h2>
+      </div>
+      <div class="accbox">
+        <article class="acc" v-for="(item,ix) in faqs" v-bind:key="item.q">
+          <button type="button" v-bind:aria-expanded="(accIx===ix).toString()" v-on:click="togAcc(ix)">
+            <span>{{ item.q }}</span>
+            <span class="plus" v-bind:class="{turn:accIx===ix}">+</span>
+          </button>
+          <div class="accbody" v-show="accIx===ix"><p>{{ item.a }}</p></div>
+        </article>
+      </div>
+    </section>
+
+  </main>
+  <footer>
+    <div>
+      <a class="brand foot-brand" href="#home">BalcoBio</a>
+      <p>A small-space guide to plants, wildlife and everyday balcony habitats.</p>
+    </div>
+    <a href="#home">Back to top</a>
+  </footer>
+
+</div>
+<script src="assets/vue.global.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
